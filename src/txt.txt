@@ -1,0 +1,233 @@
+import { useState } from "react";
+//import "./App.css";
+import "./Apptwo.css";
+// all components create, render list in packaging list , then create component item
+//render list, create prop and pass props, set style in jsx;
+
+//Form
+//add select,input,button in form component now to get options dynamically use array.from
+// now we want to submit form so we create event handleSubmit, and we don't want the page to reload so we
+//use e.preventDefault();
+//then w use controlled elements. Definition: Controlled elements are form inputs (like <input> or <select>) whose values are controlled by React state rather than the DOM. In other words, React is the single source of truth for the value of the form field.
+//it has 3 steps, first create state, then   use the value prop to bind the input to the state and at last  Handle User Input with onChange. (e.target.value) e tell event, e.target is one element. and then the value we want
+// Now use these values, in handleSubmit, it will click or enter when we submit else not
+//when their is no description in input then we should'nt be able to submit the form so we give guard clause.
+//then set the description to its original state after submiting
+//7.1 to 7.4
+//now copies state and function in app component. and pass item as prop to packaging list.also pass handleNewItme as prop to form
+//form is actually responsible for creatingg new item so we pass function handleNewItem to it.
+//now to delete the item when click on X button in item component. each of them is item component, so it wil happen in itmem component but state is in app component.
+//so create new function in app handleDeleteitem(). use filter method to return new array with deleted item.and pass this function as prop to packaging list and also pass this as prop from packaginglist to item. and in item cll onclick and pass onDeleteItem(item.id)
+//create checkbox to know what we packed. so we first give tag <input type="checkbox" with value={item.packed} and use onchange event. create handletoggleItem and return new list and pass it as prop to packing list and item and called in onchange. | Before click | `packed` value | After click |
+// | ------------ | -------------- | ----------- |
+// | ❌ Unchecked  | `false`        | ✅ `true`    |
+// | ✅ Checked    | `true`         | ❌ `false`   |
+//now we need to get number of itema  in stats componet. and pass items as prop to stats as we need to find length and do calculation in stats using items
+//now for getting the sortin list in packaging list, to get dynamic value we create state. and then to get output based on value create desired state.
+//in packaginglist to add clear all button to delete all list
+// const initialItems = [
+//   { id: 1, description: "Passports", quantity: 2, packed: false },
+//   { id: 2, description: "Socks", quantity: 12, packed: false },
+//   { id: 3, description: "Clothes", quantity: 7, packed: true },
+// ];
+
+function App() {
+  //8.1
+  const [items, setItems] = useState([]);
+  //const numItems = items.length; we need to use it in Stats component
+  function handleNewItem(item) {
+    setItems((items) => [...items, item]);
+  }
+
+  function handleDeleteItem(id) {
+    setItems((items) => items.filter((item) => item.id !== id));
+  }
+  // id passed as prop to know which item is selected
+  function handleToggleItem(id) {
+    setItems((items) =>
+      items.map(
+        (
+          item //packed: !item.packed is an oject, it invert the packed value. i.e in item compont value = item.packed which is true so here it is converted to false and if flase then converted to true
+        ) => (item.id === id ? { ...item, packed: !item.packed } : item)
+      )
+    );
+  }
+
+  function handleClearList() {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete all list? 🤔"
+    );
+    if (confirmed) setItems([]); // items to empty array pass prop to packaginlist
+  }
+  return (
+    <div className="app">
+      <Logo />
+      <Form onAddItem={handleNewItem} />
+      <PackagingList
+        items={items}
+        onDeleteItem={handleDeleteItem}
+        onToggleItem={handleToggleItem}
+        onClearList={handleClearList}
+      />
+      {/*also in component */}
+      <Stats items={items} />
+    </div>
+  );
+}
+function Logo() {
+  return <h1>🌴 Far Away 💼</h1>;
+}
+
+function Form({ onAddItem }) {
+  const [description, setDescription] = useState(""); //same steps : step 1
+  const [quantity, setQuantity] = useState(1); //step 1: create state
+
+  //const [items, setItems] = useState([]) //7.2[] as packaging list contains array of items
+  //now to add new items to given item create new function and pass it to handleSubmit
+  // function handleNewItem(item){
+  //   setItems((items) => [...items,item]);
+  // }//7.4 but these items are not visible in ui as we are not using this items in form but in packaging list, so we need to get it in packaging list but we can't pass it as prop as props can only pass to child prop .
+  // //so we use technique state up, which moves state to closes common parent component which is app. also this function
+  // //only goal of form is to add new items to array but not to render it.
+
+  function handleSubmit(e) {
+    e.preventDefault(); //not to reload on submit
+
+    if (!description) return; //if no description, not able to submit
+
+    const newItem = { quantity, description, packed: false, id: Date.now() }; //newItem is here but it needs to be rendered in packaging list
+    //7.1we need to create state of newItem to disply of UI as the value of newItem keeps on changing as we input new items
+
+    //console.log(newItem);
+    onAddItem(newItem);
+    //handleNewItem(newItem); //7.3
+    //after submit form return to normal or original state
+    setDescription(""); //
+    setQuantity(1);
+  }
+  return (
+    <form className="add-form" onSubmit={handleSubmit}>
+      <h3>What do you need for your 😍 trip?</h3>
+      <select
+        value={quantity} //step 2 :force element to take value of the state
+        onChange={(e) => {
+          //step 3:the use onChange to update the state when user types
+          console.log(e.target.value);
+          setQuantity(Number(e.target.value));
+          // e.target.value always returns a string, so we first need to convert it to numbers as quantity is number
+        }}
+      >
+        {/* { length: 20 }: defines the size of the array. */}
+        {/* (_, i) => i: is the mapping function where _ is the unused element (since we're just interested in the index), and i is the index (from 0 to 19). */}
+        {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
+          <option value={num} key={num}>
+            {num}
+          </option>
+        ))}
+      </select>
+
+      <input
+        type="text"
+        placeholder="item..."
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+
+      <button>Add</button>
+      {/* note:we can also use onclick="handleclick " instead of handlesubmit
+       <button onClick="handleClick">Add</button> 
+        this will also work but it will only work on the click of button
+        so then it will not work when we hit "enter" while on input.    
+      */}
+    </form>
+  );
+}
+//rendering the list
+function PackagingList({ items, onDeleteItem, onToggleItem, onClearList }) {
+  const [sortBy, setSortBy] = useState("input");
+
+  let sortedItems;
+
+  if (sortBy === "input") sortedItems = items; //if equal to input then print as it is
+
+  if (sortBy === "description")
+    sortedItems = items
+      .slice()
+      .sort((a, b) => a.description.localeCompare(b.description)); //slice creates new copy of array so old one does not change
+
+  if (sortBy === "packed")
+    sortedItems = items
+      .slice()
+      .sort((a, b) => Number(a.packed) - Number(b.packed)); //packed is boolean so first need to convert it to number so used Number
+
+  return (
+    <div className="list">
+      <ul>
+        {/* use map to render list */}
+        {/* initialItems.map */}
+        {/* {items.map((item) => ( */}
+        {sortedItems.map((item) => (
+          <Item
+            item={item}
+            onDeleteItem={onDeleteItem}
+            onToggleItem={onToggleItem}
+            onClearList={onClearList}
+            key={item.id}
+          />
+        ))}
+        {/* call component and create prop */}
+      </ul>
+      {/* sorting.create state and desired state to renderlist based on input */}
+      <div className="actions">
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+          <option value="input">Sort by input order</option>
+          <option value="description">Sort by description order</option>
+          <option value="packed">Sort by packed order</option>
+        </select>
+        <button onClick={onClearList}>Clear List</button>
+        {/*create controlled element-  */}
+      </div>
+    </div>
+  );
+}
+
+function Item({ item, onDeleteItem, onToggleItem }) {
+  //give prop
+  return (
+    <li>
+      <input
+        type="checkbox"
+        value={item.packed}
+        onChange={() => onToggleItem(item.id)}
+      />
+      <span style={item.packed ? { textDecoration: "line-through" } : {}}>
+        {item.quantity} {item.description}
+      </span>
+      <button onClick={() => onDeleteItem(item.id)}>❌</button>
+    </li>
+  );
+}
+
+function Stats({ items }) {
+  //if no items then
+  if (!items.length)
+    return (
+      <p className="stats">
+        <em>Start adding some items to you packing list. 🚀</em>
+      </p>
+    );
+
+  const numItems = items.length; //length
+  const numPacked = items.filter((item) => item.packed).length;
+  const numPercentage = Math.round((numPacked / numItems) * 100);
+  return (
+    <footer className="stats">
+      <em>
+        {numPercentage === 100
+          ? `You go everything! Ready to Go ✈️`
+          : `🎒 You have ${numItems} items on your list and you already packed ${numPacked} (${numPercentage}%)`}
+      </em>
+    </footer>
+  );
+}
+export default App;
