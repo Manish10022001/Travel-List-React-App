@@ -4,9 +4,11 @@ import Logo from "./components/Logo";
 import Form from "./components/Form";
 import PackagingList from "./components/PackagingList";
 import Stats from "./components/Stats";
+import ConfirmModal from "./components/ConfirmModal"; 
 
 function App() {
   const [items, setItems] = useState([]);
+    const [showModal, setShowModal] = useState(false); //for confirm modal : last step
 
   function handleNewItem(item) {
     setItems((items) => [...items, item]);
@@ -24,11 +26,24 @@ function App() {
     );
   }
 
+  // function handleClearList() {
+  //   const confirmed = window.confirm(
+  //     "Are you sure you want to delete all list? 🤔"
+  //   );
+  //   if (confirmed) setItems([]);
+  // }
+  
   function handleClearList() {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete all list? 🤔"
-    );
-    if (confirmed) setItems([]);
+    setShowModal(true); // SHOW MODAL instead of window.confirm
+  }
+
+  function confirmClearList() {
+    setItems([]);
+    setShowModal(false);
+  }
+
+  function cancelClearList() {
+    setShowModal(false);
   }
 
   return (
@@ -42,6 +57,14 @@ function App() {
         onClearList={handleClearList}
       />
       <Stats items={items} />
+      {/* for confrimmodal jsx, trigger */}
+       {showModal && (
+        <ConfirmModal
+          message="Are you sure you want to delete the entire list? 🤔"
+          onConfirm={confirmClearList}
+          onCancel={cancelClearList}
+        />
+       )}
     </div>
   );
 }
