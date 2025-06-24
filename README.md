@@ -20,8 +20,8 @@ Trvllyst is a simple React app built with Vite that helps travelers create and m
 To run the project locally:
 
 ```bash
-git clone https://github.com/yourusername/trvllyst.git
-cd trvllyst
+git clone https://github.com/Manish10022001/Travel-List-React-App.git
+cd Travel-List-React-App
 npm install
 npm run dev
 ```
