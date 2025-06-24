@@ -24,10 +24,10 @@ git clone https://github.com/yourusername/trvllyst.git
 cd trvllyst
 npm install
 npm run dev
+```
 
 Open http://localhost:3000 to view it in your browser.
 
-Live Demo
-Try it out live here: https://trvllyst.netlify.app
+## Live Demo
 
-
+Try it out live here: [https://trvllyst.netlify.app](https://trvllyst.netlify.app)
